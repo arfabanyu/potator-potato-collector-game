@@ -1,11 +1,18 @@
-import Player from "./models/Player.js";
-import Enemy from "./models/Enemy.js";
-import SpaceObject from "./models/SpaceObject.js";
-import { isColliding } from "./lib/isColliding.js";
+import Player from './models/Player.js';
+import Enemy from './models/Enemy.js';
+import SpaceObject from './models/SpaceObject.js';
+import { isColliding } from './lib/isColliding.js';
 
-let player, enemy, spaceObject, keys = [];
+let player,
+  enemy,
+  spaceObject,
+  keys = [];
 
-let timeLeft = 0, timeInterval, score = 0, animationFrameId, isPaused = false;
+let timeLeft = 0,
+  timeInterval,
+  score = 0,
+  animationFrameId,
+  isPaused = false;
 
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
@@ -21,148 +28,186 @@ const inGame = document.querySelector('.in-game');
 
 const menuConditionNotification = document.querySelector('.menu-condition');
 
+const startMenuBgMusic = new Audio(
+  './design/source/retro-game-arcade-236133.mp3'
+);
+const inGameBgMusic = new Audio(
+  './design/source/game-gaming-minecraft-background-music-379533.mp3'
+);
+const startGameSFX = new Audio('./design/source/game-start-6104.mp3');
+const itemCollectSFX = new Audio('./design/source/game-bonus-02-294436.mp3');
+const gameOverSFX = new Audio('./design/source/game-over.mp3');
+const gameWinSFX = new Audio(
+  './design/source/game-win.mp3'
+);
+
+const pauseBtn = document.querySelector('#pause');
+const resumeBtn = document.querySelector('#resume');
+
 // Init awal
 player = new Player(100, 100, 20);
 enemy = new Enemy(canvasWidth / 2, canvasHeight / 2, 20);
 
-function initGame(e){
-    e.preventDefault();
+setTimeout(() => startMenuBgMusic.play(), 1000)
 
-    // ambil input value
-    const nameInput = document.querySelector('.start-menu #name').value;
-    const durationInput = parseInt(document.querySelector('.start-menu #duration').value) || 60;
-    const spaceObjectsInput = parseInt(document.querySelector('.start-menu #space-objects').value) || 20;
+function initGame(e) {
+  e.preventDefault();
 
-    // defines variables
-    timeLeft = durationInput;
-    score = 0;
-    isPaused = false;
+  // ambil input value
+  const nameInput = document.querySelector('.start-menu #name').value;
+  const durationInput =
+    parseInt(document.querySelector('.start-menu #duration').value) || 60;
+  const spaceObjectsInput =
+    parseInt(document.querySelector('.start-menu #space-objects').value) || 20;
 
-    // display input values
-    nameDisplay.textContent = 'name: ' + nameInput;
-    timeDisplay.textContent = 'time: ' + durationInput;
-    scoreDisplay.textContent = 'score: ' + score;
+  // defines variables
+  timeLeft = durationInput;
+  score = 0;
+  isPaused = false;
 
-    // change page
-    startMenu.style.display = 'none';
-    inGame.style.display = 'grid';
+  // display input values
+  nameDisplay.textContent = 'name: ' + nameInput;
+  timeDisplay.textContent = 'time: ' + durationInput;
+  scoreDisplay.textContent = 'score: ' + score;
 
-    // init model game
-    player = new Player(100, 100, 20);
-    enemy = new Enemy(canvasWidth / 2, canvasHeight / 2, 20);
-    spaceObject = Array.from({length: spaceObjectsInput}, (_, i) => new SpaceObject(
-        Math.random() * canvasWidth,
-        Math.random() * canvasHeight,
+  // change page
+  startMenu.style.display = 'none';
+  inGame.style.display = 'grid';
+
+  // init model game
+  player = new Player(100, 100, 20);
+  enemy = new Enemy(canvasWidth / 2, canvasHeight / 2, 30);
+  spaceObject = Array.from(
+    { length: spaceObjectsInput },
+    (_, i) =>
+      new SpaceObject(
+        Math.random() * (canvasWidth - 25),
+        Math.random() * (canvasHeight - 25),
         5,
-        i % 4 === 0 ? 20 : 5,
-    ));
+        i % 4 === 0 ? 20 : i % 2 === 0 ? 10 : 5
+      )
+  );
 
-    // set time ticking
-    timeInterval = setInterval(() => {
-        if (!isPaused) {
-            timeLeft--;
-            timeDisplay.textContent = 'time: ' + timeLeft;
-            if (timeLeft === 0) {
-                endGame();
-                notification('Waktu kamu habis! Kamu kalah!');
-                return;
-            }
-        }
-    }, 1000);
+  // set time ticking
+  timeInterval = setInterval(() => {
+    if (!isPaused) {
+      timeLeft--;
+      timeDisplay.textContent = 'time: ' + timeLeft;
+      if (timeLeft === 0) {
+        endGame();
+        notification('Waktu kamu habis! Kamu kalah!');
+        gameOverSFX.play();
+        return;
+      }
+    }
+  }, 1000);
 
-    // canvas draw loop
-    gameLoop()
+  startMenuBgMusic.pause();
+  startGameSFX.play();
+  inGameBgMusic.play();
+
+  // canvas draw loop
+  gameLoop();
 }
 
 function gameLoop() {
-    if (isPaused) return;
+  if (isPaused) return;
 
-    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-    player.move();
-    player.draw(ctx);
-    enemy.moveTowards(player);
-    enemy.draw(ctx, player);
+  player.move();
+  player.draw(ctx);
+  enemy.moveTowards(player);
+  enemy.draw(ctx, player);
+  spaceObject.forEach((obj) => obj.update());
 
-    // defines collisions
-    if (isColliding(player, enemy)) {
-        endGame();
-        notification('Kamu tertangkap musuh! Kamu kalah!');
-        return;
+  // defines collisions
+  if (isColliding(player, enemy)) {
+    endGame();
+    notification('Kamu tertangkap musuh! Kamu kalah!');
+    gameOverSFX.play();
+    return;
+  }
+
+  spaceObject = spaceObject.filter((object) => {
+    if (isColliding(player, object)) {
+      score += object.score;
+      scoreDisplay.textContent = 'score: ' + score;
+      itemCollectSFX.pause();
+      itemCollectSFX.currentTime = 0;
+      itemCollectSFX.play();
+      return false;
     }
+    object.draw(ctx);
+    return true;
+  });
 
-    spaceObject = spaceObject.filter(object => {
-        if (isColliding(player, object)) {
-            score += object.score;
-            scoreDisplay.textContent = 'score: ' + score;
-            return false; 
-        }
-        object.draw(ctx);
-        return true;
-    })
+  // defines win
+  if (spaceObject.length === 0) {
+    endGame();
+    notification('Kamu mengumpulkan semua object! Kamu menang!');
+    gameWinSFX.play();
+    return;
+  }
 
-    // defines win
-    if (spaceObject.length === 0) {
-        endGame();
-        notification('Kamu mengumpulkan semua object! Kamu menang!');
-        return;
-    }
-
-    // looping draw (fps)
-    animationFrameId = requestAnimationFrame(gameLoop);
+  // looping draw (fps)
+  animationFrameId = requestAnimationFrame(gameLoop);
 }
-
 
 // condition functions
 function endGame() {
-    isPaused = true;
-    cancelAnimationFrame(animationFrameId);
-    clearInterval(timeInterval);
+  isPaused = true;
+  cancelAnimationFrame(animationFrameId);
+  inGameBgMusic.pause();
+  clearInterval(timeInterval);
 }
 
 function notification(text) {
-    const notification = document.querySelector('.notification');
-    const h2 = document.querySelector('.notification h2');
-    const scoreDisplay = document.querySelector('.notification #score');
+  const notification = document.querySelector('.notification');
+  const h2 = document.querySelector('.notification h2');
+  const scoreDisplay = document.querySelector('.notification #score');
 
-    scoreDisplay.textContent = 'score: ' + score; 
-    h2.textContent = text;
-    notification.style.display = 'grid'
+  scoreDisplay.textContent = 'score: ' + score;
+  h2.textContent = text;
+  notification.style.display = 'grid';
 }
 
 function menuCondition(text) {
-    menuConditionNotification.querySelector('p').textContent = text;
-    menuConditionNotification.style.display = 'grid';
+  menuConditionNotification.querySelector('p').textContent = text;
+  menuConditionNotification.style.display = 'grid';
 }
-
 
 // button functions
 function pause() {
-    isPaused = true;
-    cancelAnimationFrame(animationFrameId);
-    menuCondition('Game Paused');
+  isPaused = true;
+  cancelAnimationFrame(animationFrameId);
+  menuCondition('Game Paused');
 }
 
 function resume() {
-    isPaused = false;
-    gameLoop();
-    menuConditionNotification.style.display = 'none';
+  isPaused = false;
+  resumeBtn.disabled = !isPaused;
+  pauseBtn.disabled = isPaused;
+  gameLoop();
+  menuConditionNotification.style.display = 'none';
 }
 
 function reset() {
-    isPaused = true;
-    cancelAnimationFrame(animationFrameId);
-    startMenu.style.display = 'grid';
-    inGame.style.display = 'none';
+  isPaused = true;
+  cancelAnimationFrame(animationFrameId);
+  startMenu.style.display = 'grid';
+  inGame.style.display = 'none';
 }
 
 function exit() {
-    location.reload();
+  location.reload();
 }
 
 // button click events
 document.querySelector('.paused-menu #pause').addEventListener('click', pause);
-document.querySelector('.paused-menu #resume').addEventListener('click', resume);
+document
+  .querySelector('.paused-menu #resume')
+  .addEventListener('click', resume);
 document.querySelector('.paused-menu #reset').addEventListener('click', reset);
 document.querySelectorAll('#exit')[0].addEventListener('click', exit);
 document.querySelectorAll('#exit')[1].addEventListener('click', exit);
@@ -170,23 +215,25 @@ document.querySelector('.start-menu form').addEventListener('submit', initGame);
 
 // game controls
 document.addEventListener('keydown', (e) => {
-    keys[e.key] = true;
-    const key = e.key.toLowerCase();
-    if (['arrowup', 'w'].includes(key)) player.dy = -player.speed;
-    if (['arrowdown', 's'].includes(key)) player.dy = player.speed;
-    if (['arrowleft', 'a'].includes(key)) player.dx = -player.speed;
-    if (['arrowright', 'd'].includes(key)) player.dx = player.speed;
+  keys[e.key] = true;
+  const key = e.key.toLowerCase();
+  if (['arrowup', 'w'].includes(key)) player.dy = -player.speed;
+  if (['arrowdown', 's'].includes(key)) player.dy = player.speed;
+  if (['arrowleft', 'a'].includes(key)) player.dx = -player.speed;
+  if (['arrowright', 'd'].includes(key)) player.dx = player.speed;
 
-    // pause control
-    if (['p'].includes(e.key) && !isPaused) pause();
-    if (['p'].includes(e.key) && isPaused) resume();
+  // pause control
+  if (['p'].includes(e.key) && !isPaused) pause();
+  if (['p'].includes(e.key) && isPaused) resume();
 });
 
 document.addEventListener('keyup', (e) => {
-    keys[e.key] = false;
-    const movingHorizontally = keys['ArrowLeft'] || keys['ArrowRight'] || keys['d'] || keys['a']; 
-    const movingVertically = keys['ArrowUp'] || keys['ArrowDown'] || keys['w'] || keys['s']; 
+  keys[e.key] = false;
+  const movingHorizontally =
+    keys['ArrowLeft'] || keys['ArrowRight'] || keys['d'] || keys['a'];
+  const movingVertically =
+    keys['ArrowUp'] || keys['ArrowDown'] || keys['w'] || keys['s'];
 
-    if (!movingHorizontally) player.dx = 0;
-    if (!movingVertically) player.dy = 0;
+  if (!movingHorizontally) player.dx = 0;
+  if (!movingVertically) player.dy = 0;
 });

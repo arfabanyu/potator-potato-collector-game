@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Space Cleaner</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="start-menu">
+      <img src="./design/source/banyu_game_logo.png" alt="Game Cleaner" />
+      <div class="container">
+        <div>
+          <h2>Instructions</h2>
+          <p>How to play this game</p>
+          <ol>
+            <li>Enter your name and set the game duration (in seconds)</li>
+            <li>(Optional) Set the number of space objects to collect.</li>
+            <li>Click Play to start the game.</li>
+            <li>Use arrow keys or WASD to move the Phyton around the board.</li>
+            <li>Pause/Resume: Press `P` or click Pause button</li>
+            <li>
+              Collect all space objects (small = 5 points, large = 20 points).
+            </li>
+            <li>Avoid the enemy spaceship chasing you.</li>
+          </ol>
+
+          <p>Game ends if:</p>
+          <ul>
+            <li>You collect all objects safely</li>
+            <li>Time runs out before collection</li>
+            <li>You’re caught by the enemy</li>
+          </ul>
+          <p>Try to survive and collect all space objects!</p>
+        </div>
+        <form>
+          <label for="name">Name</label>
+          <input
+            type="text"
+            name="name"
+            id="name"
+            placeholder="required"
+            required
+          />
+          <label for="duration">Max. Duration</label>
+          <input
+            type="number"
+            name="duration"
+            id="duration"
+            placeholder="required"
+            required
+          />
+          <label for="space-objects">Space Objects</label>
+          <input
+            type="number"
+            name="space-objects"
+            placeholder="optional"
+            id="space-objects"
+          />
+          <button>Play</button>
+        </form>
+      </div>
+    </div>
+    <div class="in-game">
+      <div class="top-bar">
+        <p id="name"></p>
+        <p id="time"></p>
+        <p id="score"></p>
+      </div>
+      <canvas height="350" width="550"></canvas>
+      <div class="paused-menu">
+        <button id="pause">Pause</button>
+        <button id="resume">Continue</button>
+        <button id="reset">Reset</button>
+        <button id="exit">Exit</button>
+      </div>
+      <div class="notification">
+        <h2></h2>
+        <p id="score"></p>
+        <button id="exit">Exit</button>
+      </div>
+      <div class="menu-condition">
+        <p></p>
+      </div>
+    </div>
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>

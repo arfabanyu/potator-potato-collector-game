@@ -29,15 +29,15 @@ const inGame = document.querySelector('.in-game');
 const menuConditionNotification = document.querySelector('.menu-condition');
 
 const startMenuBgMusic = new Audio(
-  './public/audios/retro-game-arcade-236133.mp3'
+  'public/audios/retro-game-arcade-236133.mp3'
 );
 const inGameBgMusic = new Audio(
-  './public/audios/game-gaming-minecraft-background-music-379533.mp3'
+  'public/audios/game-gaming-minecraft-background-music-379533.mp3'
 );
-const startGameSFX = new Audio('./public/audios/game-start-6104.mp3');
-const itemCollectSFX = new Audio('./public/audios/game-bonus-02-294436.mp3');
-const gameOverSFX = new Audio('./public/audios/game-over.mp3');
-const gameWinSFX = new Audio('./public/audios/game-win.mp3');
+const startGameSFX = new Audio('public/audios/game-start-6104.mp3');
+const itemCollectSFX = new Audio('public/audios/game-bonus-02-294436.mp3');
+const gameOverSFX = new Audio('public/audios/game-over.mp3');
+const gameWinSFX = new Audio('public/audios/game-win.mp3');
 
 const pauseBtn = document.querySelector('#pause');
 const resumeBtn = document.querySelector('#resume');

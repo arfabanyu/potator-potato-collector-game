@@ -63,7 +63,7 @@ button:hover {
   canvas {
     width: 500px;
     height: 450px;
-    background: url('./design/source/board_background.jpg') center center
+    background: url('public/images/board_background.jpg') center center
       no-repeat;
     background-size: contain;
     border: 1px white solid;

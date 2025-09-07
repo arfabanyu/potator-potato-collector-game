@@ -219,25 +219,39 @@ document.querySelector('.start-menu form').addEventListener('submit', initGame);
 
 // game controls
 document.addEventListener('keydown', (e) => {
-  keys[e.key] = true;
   const key = e.key.toLowerCase();
-  if (['arrowup', 'w'].includes(key)) player.dy = -player.speed;
-  if (['arrowdown', 's'].includes(key)) player.dy = player.speed;
-  if (['arrowleft', 'a'].includes(key)) player.dx = -player.speed;
-  if (['arrowright', 'd'].includes(key)) player.dx = player.speed;
+  keys[key] = true;
 
   // pause control
-  if (['p'].includes(e.key) && !isPaused) pause();
-  if (['p'].includes(e.key) && isPaused) resume();
+  if (key === 'p') {
+    if (!isPaused) pause();
+    else resume();
+  }
+
+  updatePlayerVelocity();
 });
 
 document.addEventListener('keyup', (e) => {
-  keys[e.key] = false;
-  const movingHorizontally =
-    keys['ArrowLeft'] || keys['ArrowRight'] || keys['d'] || keys['a'];
-  const movingVertically =
-    keys['ArrowUp'] || keys['ArrowDown'] || keys['w'] || keys['s'];
+  const key = e.key.toLowerCase();
+  keys[key] = false;
 
-  if (!movingHorizontally) player.dx = 0;
-  if (!movingVertically) player.dy = 0;
+  updatePlayerVelocity();
 });
+function updatePlayerVelocity() {
+  let dx = 0;
+  let dy = 0;
+
+  if (keys['arrowup'] || keys['w']) dy -= 1;
+  if (keys['arrowdown'] || keys['s']) dy += 1;
+  if (keys['arrowleft'] || keys['a']) dx -= 1;
+  if (keys['arrowright'] || keys['d']) dx += 1;
+
+  if (dx !== 0 || dy !== 0) {
+    const length = Math.sqrt(dx * dx + dy * dy);
+    dx = (dx / length) * player.speed;
+    dy = (dy / length) * player.speed;
+  }
+
+  player.dx = dx;
+  player.dy = dy;
+}

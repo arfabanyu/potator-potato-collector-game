@@ -29,15 +29,15 @@ const inGame = document.querySelector('.in-game');
 const menuConditionNotification = document.querySelector('.menu-condition');
 
 const startMenuBgMusic = new Audio(
-  './design/source/retro-game-arcade-236133.mp3'
+  './public/audios/retro-game-arcade-236133.mp3'
 );
 const inGameBgMusic = new Audio(
-  './design/source/game-gaming-minecraft-background-music-379533.mp3'
+  './public/audios/game-gaming-minecraft-background-music-379533.mp3'
 );
-const startGameSFX = new Audio('./design/source/game-start-6104.mp3');
-const itemCollectSFX = new Audio('./design/source/game-bonus-02-294436.mp3');
-const gameOverSFX = new Audio('./design/source/game-over.mp3');
-const gameWinSFX = new Audio('./design/source/game-win.mp3');
+const startGameSFX = new Audio('./public/audios/game-start-6104.mp3');
+const itemCollectSFX = new Audio('./public/audios/game-bonus-02-294436.mp3');
+const gameOverSFX = new Audio('./public/audios/game-over.mp3');
+const gameWinSFX = new Audio('./public/audios/game-win.mp3');
 
 const pauseBtn = document.querySelector('#pause');
 const resumeBtn = document.querySelector('#resume');
@@ -46,7 +46,13 @@ const resumeBtn = document.querySelector('#resume');
 player = new Player(100, 100, 20);
 enemy = new Enemy(canvasWidth / 2, canvasHeight / 2, 20);
 
-setTimeout(() => startMenuBgMusic.play(), 1000);
+document.addEventListener(
+  'click',
+  () => {
+    startMenuBgMusic.play();
+  },
+  { once: true }
+);
 
 function initGame(e) {
   e.preventDefault();

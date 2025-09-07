@@ -7,7 +7,7 @@ export default class Player {
     this.dy = 0;
     this.speed = 2;
     this.image = new Image();
-    this.image.src = '../design/source/musang.png';
+    this.image.src = '../public/images/musang.png';
   }
 
   move() {

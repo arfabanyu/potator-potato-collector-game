@@ -18,10 +18,10 @@ export default class SpaceObject {
   draw(ctx) {
     this.image.src =
       this.score === 20
-        ? '../design/source/koin.png'
+        ? '../public/images/koin.png'
         : this.score === 10
-        ? '../design/source/kentang.png'
-        : '../design/source/minuman.png';
+        ? '../public/images/kentang.png'
+        : '../public/images/minuman.png';
 
     const size =
       this.score === 20

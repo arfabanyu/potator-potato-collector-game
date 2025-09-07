@@ -7,7 +7,7 @@ export default class Enemy {
     this.dy = 0;
     this.speed = 0.8;
     this.image = new Image();
-    this.image.src = '../design/source/villain.png';
+    this.image.src = '../public/images/villain.png';
   }
 
   moveTowards(player) {

@@ -1,21 +1,22 @@
 {
-    "cSpell.words": [
-        "ambil",
-        "arrowdown",
-        "arrowleft",
-        "arrowright",
-        "arrowup",
-        "awal",
-        "habis",
-        "kalah",
-        "kamu",
-        "menang",
-        "mengumpulkan",
-        "musuh",
-        "Phyton",
-        "semua",
-        "tertangkap",
-        "Waktu",
-        "WASD"
-    ]
+  "cSpell.words": [
+    "ambil",
+    "arrowdown",
+    "arrowleft",
+    "arrowright",
+    "arrowup",
+    "awal",
+    "habis",
+    "kalah",
+    "kamu",
+    "menang",
+    "mengumpulkan",
+    "musuh",
+    "Phyton",
+    "semua",
+    "tertangkap",
+    "Waktu",
+    "WASD"
+  ],
+  "liveServer.settings.port": 5833
 }

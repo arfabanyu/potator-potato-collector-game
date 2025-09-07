@@ -37,9 +37,7 @@ const inGameBgMusic = new Audio(
 const startGameSFX = new Audio('./design/source/game-start-6104.mp3');
 const itemCollectSFX = new Audio('./design/source/game-bonus-02-294436.mp3');
 const gameOverSFX = new Audio('./design/source/game-over.mp3');
-const gameWinSFX = new Audio(
-  './design/source/game-win.mp3'
-);
+const gameWinSFX = new Audio('./design/source/game-win.mp3');
 
 const pauseBtn = document.querySelector('#pause');
 const resumeBtn = document.querySelector('#resume');
@@ -48,7 +46,7 @@ const resumeBtn = document.querySelector('#resume');
 player = new Player(100, 100, 20);
 enemy = new Enemy(canvasWidth / 2, canvasHeight / 2, 20);
 
-setTimeout(() => startMenuBgMusic.play(), 1000)
+setTimeout(() => startMenuBgMusic.play(), 1000);
 
 function initGame(e) {
   e.preventDefault();

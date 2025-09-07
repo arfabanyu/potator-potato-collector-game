@@ -28,15 +28,27 @@ export default class Player {
     ctx.save();
     ctx.translate(this.x, this.y);
 
-  if (this.dx < 0) {
-    // Menghadap kiri
-    ctx.scale(-1, 1); // mirror horizontal
-    ctx.drawImage(this.image, -this.size, -this.size, this.size * 2, this.size * 2);
-  } else {
-    // Menghadap kanan
-    ctx.drawImage(this.image, -this.size, -this.size, this.size * 2, this.size * 2);
-  }
+    if (this.dx < 0) {
+      // Menghadap kiri
+      ctx.scale(-1, 1); // mirror horizontal
+      ctx.drawImage(
+        this.image,
+        -this.size,
+        -this.size,
+        this.size * 2,
+        this.size * 2
+      );
+    } else {
+      // Menghadap kanan
+      ctx.drawImage(
+        this.image,
+        -this.size,
+        -this.size,
+        this.size * 2,
+        this.size * 2
+      );
+    }
 
-  ctx.restore();
+    ctx.restore();
   }
 }

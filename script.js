@@ -68,6 +68,7 @@ function initGame() {
   spaceObject = null;
   clearInterval(timeInterval);
   timeInterval = null;
+  
 
   score = 0;
   isPaused = false;

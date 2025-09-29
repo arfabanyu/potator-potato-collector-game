@@ -19,7 +19,7 @@ const ctx = canvas.getContext('2d');
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
 
-const nameDisplay = document.querySelector('.top-bar #name');
+// const nameDisplay = document.querySelector('.top-bar #name');
 const timeDisplay = document.querySelector('.top-bar #time');
 const scoreDisplay = document.querySelector('.top-bar #score');
 
@@ -46,6 +46,13 @@ const resumeBtn = document.querySelector('#resume');
 player = new Player(100, 100, 20);
 enemy = new Enemy(canvasWidth / 2, canvasHeight / 2, 20);
 
+let bestScore = localStorage.getItem('bestScore') || 0;
+let longestTime = localStorage.getItem('longestTime') || 0;
+
+document.querySelector('#best-score').textContent = 'Best Score: ' + bestScore;
+document.querySelector('#longest-time').textContent =
+  'Longest Time: ' + longestTime + 's';
+
 document.addEventListener(
   'click',
   () => {
@@ -54,24 +61,18 @@ document.addEventListener(
   { once: true }
 );
 
-function initGame(e) {
-  e.preventDefault();
+function initGame() {
+  timeLeft = 0;
+  player = null;
+  enemy = null;
+  spaceObject = null;
+  clearInterval(timeInterval);
+  timeInterval = null;
 
-  // ambil input value
-  const nameInput = document.querySelector('.start-menu #name').value;
-  const durationInput =
-    parseInt(document.querySelector('.start-menu #duration').value) || 60;
-  const spaceObjectsInput =
-    parseInt(document.querySelector('.start-menu #space-objects').value) || 20;
-
-  // defines variables
-  timeLeft = durationInput;
   score = 0;
   isPaused = false;
 
-  // display input values
-  nameDisplay.textContent = 'name: ' + nameInput;
-  timeDisplay.textContent = 'time: ' + durationInput;
+  timeDisplay.textContent = 'time: ' + timeLeft + 's';
   scoreDisplay.textContent = 'score: ' + score;
 
   // change page
@@ -82,7 +83,7 @@ function initGame(e) {
   player = new Player(100, 100, 20);
   enemy = new Enemy(canvasWidth / 2, canvasHeight / 2, 30);
   spaceObject = Array.from(
-    { length: spaceObjectsInput },
+    { length: 20 },
     (_, i) =>
       new SpaceObject(
         Math.random() * (canvasWidth - 25),
@@ -95,14 +96,9 @@ function initGame(e) {
   // set time ticking
   timeInterval = setInterval(() => {
     if (!isPaused) {
-      timeLeft--;
-      timeDisplay.textContent = 'time: ' + timeLeft;
-      if (timeLeft === 0) {
-        endGame();
-        notification('Waktu kamu habis! Kamu kalah!');
-        gameOverSFX.play();
-        return;
-      }
+      timeLeft++;
+      timeDisplay.textContent = 'time: ' + timeLeft + 's';
+      enemy.addSpeed();
     }
   }, 1000);
 
@@ -116,6 +112,7 @@ function initGame(e) {
 
 function gameLoop() {
   if (isPaused) return;
+  startMenuBgMusic.pause();
 
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
@@ -133,6 +130,8 @@ function gameLoop() {
     return;
   }
 
+  let newObjects = [];
+
   spaceObject = spaceObject.filter((object) => {
     if (isColliding(player, object)) {
       score += object.score;
@@ -140,19 +139,23 @@ function gameLoop() {
       itemCollectSFX.pause();
       itemCollectSFX.currentTime = 0;
       itemCollectSFX.play();
+
+      newObjects.push(
+        new SpaceObject(
+          Math.random() * (canvasWidth - 25),
+          Math.random() * (canvasHeight - 25),
+          5,
+          Math.random() < 0.25 ? 20 : Math.random() < 0.5 ? 10 : 5
+        )
+      );
+
       return false;
     }
     object.draw(ctx);
     return true;
   });
 
-  // defines win
-  if (spaceObject.length === 0) {
-    endGame();
-    notification('Kamu mengumpulkan semua object! Kamu menang!');
-    gameWinSFX.play();
-    return;
-  }
+  spaceObject.push(...newObjects);
 
   // looping draw (fps)
   animationFrameId = requestAnimationFrame(gameLoop);
@@ -164,13 +167,33 @@ function endGame() {
   cancelAnimationFrame(animationFrameId);
   inGameBgMusic.pause();
   clearInterval(timeInterval);
+
+  // cek best score
+  if (score > bestScore) {
+    bestScore = score;
+    localStorage.setItem('bestScore', bestScore);
+  }
+
+  // cek longest time
+  if (timeLeft > longestTime) {
+    longestTime = timeLeft;
+    localStorage.setItem('longestTime', longestTime);
+  }
+
+  // update UI biar langsung kelihatan
+  document.querySelector('#best-score').textContent =
+    'Best Score: ' + bestScore;
+  document.querySelector('#longest-time').textContent =
+    'Longest Time: ' + longestTime;
 }
 
 function notification(text) {
   const notification = document.querySelector('.notification');
   const h2 = document.querySelector('.notification h2');
+  const timeDisplay = document.querySelector('.notification #time');
   const scoreDisplay = document.querySelector('.notification #score');
 
+  timeDisplay.textContent = 'time: ' + timeLeft + 's';
   scoreDisplay.textContent = 'score: ' + score;
   h2.textContent = text;
   notification.style.display = 'grid';
@@ -199,8 +222,10 @@ function resume() {
 function reset() {
   isPaused = true;
   cancelAnimationFrame(animationFrameId);
-  startMenu.style.display = 'grid';
-  inGame.style.display = 'none';
+  initGame();
+
+  // startMenu.style.display = 'grid';
+  // inGame.style.display = 'none';
 }
 
 function exit() {
@@ -215,7 +240,9 @@ document
 document.querySelector('.paused-menu #reset').addEventListener('click', reset);
 document.querySelectorAll('#exit')[0].addEventListener('click', exit);
 document.querySelectorAll('#exit')[1].addEventListener('click', exit);
-document.querySelector('.start-menu form').addEventListener('submit', initGame);
+document
+  .querySelector('.start-menu .container button')
+  .addEventListener('click', initGame);
 
 // game controls
 document.addEventListener('keydown', (e) => {

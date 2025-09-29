@@ -10,6 +10,10 @@ export default class Enemy {
     this.image.src = 'public/images/villain.png';
   }
 
+  addSpeed() {
+    this.speed += 0.001;
+  }
+
   moveTowards(player) {
     this.player = player;
     const angle = Math.atan2(player.y - this.y, player.x - this.x);
